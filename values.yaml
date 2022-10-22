@@ -1,0 +1,92 @@
+server:
+  configEnabled: true
+  additionalApplications:
+    # ArgoCD apps
+    - name: argocd-apps
+      namespace: argo-cd
+      destination:
+        namespace: argo-cd
+        server: https://kubernetes.default.svc
+      project: argocd
+      source:
+        path: apps
+        repoURL: https://git.com/argocd_repo
+        targetRevision: HEAD
+        directory:
+          recurse: true
+          jsonnet: {}
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true
+    # ArgoCD projects
+    - name: argocd-projects
+      namespace: argo-cd
+      destination:
+        namespace: argo-cd
+        server: https://kubernetes.default.svc
+      project: argocd
+      source:
+        path: projects
+        repoURL: https://git.com/argocd_repo
+        targetRevision: HEAD
+        directory:
+          recurse: true
+          jsonnet: {}
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true
+    # ArgoCD secrets
+    - name: argocd-secrets
+      namespace: argo-cd
+      destination:
+        namespace: argo-cd
+        server: https://kubernetes.default.svc
+      project: argocd
+      source:
+        path: secrets
+        repoURL: https://git.com/argocd_repo
+        targetRevision: HEAD
+        directory:
+          recurse: true
+          jsonnet: {}
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true
+    # ArgoCD connected clusters
+    - name: argocd-clusters
+      namespace: argo-cd
+      destination:
+        namespace: argo-cd
+        server: https://kubernetes.default.svc
+      project: argocd
+      source:
+        path: clusters
+        repoURL: https://git.com/argocd_repo
+        targetRevision: HEAD
+        directory:
+          recurse: true
+          jsonnet: {}
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true
+  # ArgoCD project with server apps
+  additionalProjects:
+  - name: argocd
+    namespace: argo-cd
+    additionalLabels: {}
+    additionalAnnotations: {}
+    description: ArgoCD Project
+    sourceRepos:
+    - '*'
+    destinations:
+    - namespace: argo-cd
+      server: https://kubernetes.default.svc
+    clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+    orphanedResources:
+      warn: false
