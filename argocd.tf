@@ -9,17 +9,6 @@ module "iam_assumable_role_oidc" {
   oidc_fully_qualified_subjects = ["system:serviceaccount:${var.argocd_k8s_namespace}:argocd-server", "system:serviceaccount:${var.argocd_k8s_namespace}:argocd-application-controller"]
 }
 
-module "iam_assumable_role_oidc_argocd_image_updater" {
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
-  version = "5.2.0"
-
-  create_role                   = true
-  role_name                     = "k8s-argocd-image-updater"
-  provider_url                  = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
-  role_policy_arns              = ["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"]
-  oidc_fully_qualified_subjects = ["system:serviceaccount:${var.argocd_k8s_namespace}:argocd-image-updater"]
-}
-
 resource "kubernetes_namespace" "namespace_argocd" {
   metadata {
     name = var.argocd_k8s_namespace
@@ -114,27 +103,6 @@ resource "helm_release" "argocd" {
   depends_on = [
     kubernetes_namespace.namespace_argocd,
     module.iam_assumable_role_oidc
-  ]
-
-}
-
-resource "helm_release" "argocd-image-updater" {
-
-  name       = var.argocd_image_updater_chart_name
-  repository = "https://argoproj.github.io/argo-helm"
-  chart      = var.argocd_image_updater_chart_name
-  version    = var.argocd_image_updater_chart_version
-  namespace  = var.argocd_image_updater_k8s_namespace
-  values     = [file("${path.module}/templates/argocd-image-updater/values.yaml")]
-
-  set { # Annotations applied to created service account
-    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.iam_assumable_role_oidc_argocd_image_updater[0].iam_role_arn
-  }
-
-  depends_on = [
-    helm_release.argocd,
-    module.iam_assumable_role_oidc_argocd_image_updater
   ]
 
 }
