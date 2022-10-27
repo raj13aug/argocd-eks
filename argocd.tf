@@ -87,7 +87,7 @@ resource "helm_release" "argocd" {
 
   set { # Annotations applied to created service account
     name  = "server.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.iam_assumable_role_oidc[0].iam_role_arn
+    value = module.iam_assumable_role_oidc.iam_role_arn
   }
 
   set { # Define the application controller --app-resync - refresh interval for apps, default is 180 seconds
