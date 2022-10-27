@@ -22,7 +22,7 @@ resource "helm_release" "argocd" {
   chart      = var.argocd_chart_name
   version    = var.argocd_chart_version
   namespace  = var.argocd_k8s_namespace
-  values     = [file("${path.module}/templates/argocd/values.yaml")]
+  values     = [file("${path.module}/values.yaml")]
 
   ## Server params
   set {
@@ -37,7 +37,7 @@ resource "helm_release" "argocd" {
 
   set { # Maximum number of replicas for the Argo CD server HPA
     name  = "server.autoscaling.maxReplicas"
-    value = "4"
+    value = "1"
   }
 
   set { # Minimum number of replicas for the Argo CD server HPA
