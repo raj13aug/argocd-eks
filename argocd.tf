@@ -9,13 +9,22 @@ provider "kubernetes" {
   config_path = "~/.kube/config"
 }
 
+data "terraform_remote_state" "kubeconfig_file" {
+  backend = "local"
+
+  config = {
+    path = "../terraform.tfstate"
+  }
+}
+
+
 module "iam_assumable_role_oidc" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version = "5.2.0"
 
   create_role                   = true
   role_name                     = "k8s-argocd-admin"
-  provider_url                  = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
+  provider_url                  = replace(data.terraform_remote_state.kubeconfig_file.outputs.cluster_oidc_issuer_url, "https://", "")   #module.eks.cluster_oidc_issuer_url
   role_policy_arns              = []
   oidc_fully_qualified_subjects = ["system:serviceaccount:${var.argocd_k8s_namespace}:argocd-server", "system:serviceaccount:${var.argocd_k8s_namespace}:argocd-application-controller"]
 }
