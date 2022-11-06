@@ -1,4 +1,13 @@
 #https://artifacthub.io/packages/helm/argo/argo-cd/3.1.2
+provider "helm" {
+  kubernetes {
+    config_path = "~/.kube/config"
+  }
+}
+
+provider "kubernetes" {
+  config_path = "~/.kube/config"
+}
 
 module "iam_assumable_role_oidc" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
