@@ -14,7 +14,7 @@ data "terraform_remote_state" "kubeconfig_file" {
   backend = "local"
 
   config = {
-    path = "../terraform.tfstate"
+    path = "./terraform.tfstate"
   }
 }
 
